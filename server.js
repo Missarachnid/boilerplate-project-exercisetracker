@@ -45,6 +45,33 @@ const logSchema = new Schema({
 
 const Log = mongoose.model("Log", logSchema);
 
+//Check for user, create new users
+app.post("/api/users", (req,res, next)=> {
+  let checkName = req.body.username;
+  console.log(checkName);
+  User.findOne({username: checkName}, (err, data) => {
+    if (err){
+      res.send("User search error, please try again");
+      console.log("Error username search", err);
+    }
+    //If a user object was returned
+    if(data){
+      console.log("User search data", data);
+      res.send({username: data.username, _id: data._id});
+    } else {
+      //Create new user
+      let addUser = new User({username: checkName});
+      console.log("addUser", addUser);
+      addUser.save((err, newUserData) => {
+        if(err) res.send("User creation error, please try again");
+        res.send({username: newUserData.username, _id: newUserData._id })
+      });
+    }
+  });
+  
+});
+
+
 const listener = app.listen(process.env.PORT || 3000, () => {
   console.log('Your app is listening on port ' + listener.address().port)
 });
