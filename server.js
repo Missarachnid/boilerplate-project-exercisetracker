@@ -71,6 +71,14 @@ app.post("/api/users", (req,res, next)=> {
   
 });
 
+//Get an array of all users
+app.get("/api/users", (req, res) => {
+  User.find({}).select("-__v").exec((err, allUsersData) => {
+    if(err) res.send("There was an error getting user data, try agin.");
+    //This might not pass, check if it needs to say name then id
+    res.send(allUsersData);
+  });
+});
 
 const listener = app.listen(process.env.PORT || 3000, () => {
   console.log('Your app is listening on port ' + listener.address().port)
