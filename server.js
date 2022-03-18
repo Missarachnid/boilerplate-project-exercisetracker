@@ -30,7 +30,7 @@ const exerciseSchema = new Schema({
   username: {type:String, required: true},
   description: String,
   duration: Number,
-  date: String,
+  date: Date,
   id: String
 });
 
@@ -94,11 +94,11 @@ app.post("/api/users/:_id/exercises", (req, res) => {
 
   if(enteredDate.match(/(\d{4})-(\d{2})-(\d{2})/)){
     current = new Date(enteredDate);
-    enteredDate = current.toDateString();
+    enteredDate = current;
   } else {
     
     current = new Date();
-    enteredDate = current.toDateString();
+    enteredDate = current;
     //console.log("fixed date no", enteredDate);
   }
 
@@ -113,7 +113,7 @@ app.post("/api/users/:_id/exercises", (req, res) => {
         duration: req.body.duration, date: enteredDate, 
         id: userId});
     workout.save().then(saveData => {
-      let exerciseInfo = {username: saveData.username, description: saveData.description, duration: saveData.duration, date: saveData.date, _id: saveData.id}
+      let exerciseInfo = {username: saveData.username, description: saveData.description, duration: saveData.duration, date: saveData.date.toDateString(), _id: saveData.id}
       res.send(exerciseInfo);
     });
   }).catch(err => {
@@ -139,13 +139,18 @@ app.get("/api/users/:_id/exercises", (req, res) => {
 
 app.get("/api/users/:_id/logs", (req, res) => {
   let logId = req.params._id;
+
+  let toQuery = req.query.to;
+  let fromQuery = req.query.from;
+  let limitQuery = req.query.limit;
+  
   Exercise.find({id: logId}).select("-__v").exec((err, exerciseLog) => {
     if(err) res.send("There was an issue collecting user data, please try again.");
     //console.log(exerciseLog);
     let logArr = [];
     let count = 0;
     for(let j in exerciseLog){
-      logArr.push({description: exerciseLog[j]. description, duration: exerciseLog[j].duration, date: exerciseLog[j].date});
+      logArr.push({description: exerciseLog[j]. description, duration: exerciseLog[j].duration, date: exerciseLog[j].date.toDateString()});
       count = count += 1;
     }
     let newLog = {username: exerciseLog[0].username, count: count, _id: logId, logs: logArr}
