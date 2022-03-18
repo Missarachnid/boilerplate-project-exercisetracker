@@ -81,11 +81,12 @@ app.get("/api/users", (req, res) => {
     for(let el in allUsersData){
      allUsers.push({username: allUsersData[el].username, _id: allUsersData[el].id});
     }
-    console.log(allUsers);
+    //console.log(allUsers);
     res.send(allUsers);
   });
 });
 
+//Add an exercise for a user
 app.post("/api/users/:_id/exercises", (req, res) => {
   let userId = req.body[':_id'];
   let enteredDate = req.body.date;
@@ -120,6 +121,20 @@ app.post("/api/users/:_id/exercises", (req, res) => {
     res.send("This user ID doesn't exist. Please try again.");
   });
   
+})
+;
+//Get all exercises for a user
+app.get("/api/users/:_id/exercises", (req, res) => {
+  let requestId = req.params._id;
+  Exercise.find({id: requestId}).select("-__v").exec((err, exerciseData)=> {
+    if(err) res.send("There was an issue finding users exercises, please try again");
+    let allExercises = [];
+    for(let i in exerciseData){
+      allExercises.push({username: exerciseData[i].username, description: exerciseData[i].description, duration: exerciseData[i].duration, date: exerciseData[i].date, _id: exerciseData[i].id })
+    }
+    //console.log(allExercises);
+    res.send(allExercises);
+  });
 });
 
 const listener = app.listen(process.env.PORT || 3000, () => {
