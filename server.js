@@ -137,6 +137,22 @@ app.get("/api/users/:_id/exercises", (req, res) => {
   });
 });
 
+app.get("/api/users/:_id/logs", (req, res) => {
+  let logId = req.params._id;
+  Exercise.find({id: logId}).select("-__v").exec((err, exerciseLog) => {
+    if(err) res.send("There was an issue collecting user data, please try again.");
+    //console.log(exerciseLog);
+    let logArr = [];
+    let count = 0;
+    for(let j in exerciseLog){
+      logArr.push({description: exerciseLog[j]. description, duration: exerciseLog[j].duration, date: exerciseLog[j].date});
+      count = count += 1;
+    }
+    let newLog = {username: exerciseLog[0].username, count: count, _id: logId, logs: logArr}
+    res.send(newLog);
+  })
+});
+
 const listener = app.listen(process.env.PORT || 3000, () => {
   console.log('Your app is listening on port ' + listener.address().port)
 });
