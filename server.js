@@ -13,7 +13,6 @@ app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: "false" }));
 app.use(bodyParser.json());
 
-
 /***********************************************/
  /********** Serve HTML/CSS **********/
 /*********************************************/
@@ -68,22 +67,18 @@ const User = mongoose.model("User", userSchema);
 app.post("/api/users", (req,res, next)=> {
   let checkName = req.body.username;
   let newId = uuidv4();
-  //console.log(checkName);
+
   User.findOne({username: checkName}).select("-__v").exec((err, data) => {
     if (err){
       res.send("User search error, please try again");
-      //console.log("Error username search", err);
     }
     //If a user object was returned
     if(data){
-      
-      //console.log("User search data", data);
       res.send({username: data.username, _id: data.id});
     } else {
       //Create new user
       // - Might have to change the values around so name is first
       let addUser = new User({username: checkName, id: newId});
-      //console.log("addUser", addUser);
       addUser.save((err, newUserData) => {
         if(err) res.send("User creation error, please try again");
         res.send({username: newUserData.username, _id: newUserData.id })
@@ -105,7 +100,6 @@ app.get("/api/users", (req, res) => {
     for(let el in allUsersData){
      allUsers.push({username: allUsersData[el].username, _id: allUsersData[el].id});
     }
-    //console.log(allUsers);
     res.send(allUsers);
   });
 });
@@ -126,14 +120,11 @@ app.post("/api/users/:_id/exercises", (req, res) => {
     
     current = new Date();
     enteredDate = current;
-    //console.log("fixed date no", enteredDate);
   }
 
-  //console.log("all exercise", req.body);
   //For some reason using findById wouldn't work and returned a null no matter what
   //Had to use findOne and add the obj to get it to return user
   User.findOne({id: userId}).then(data => {
-    //console.log("dataFinish", data);
     let workout = new Exercise(
       {username: data.username, 
         description: req.body.description, 
@@ -163,7 +154,6 @@ app.get("/api/users/:_id/exercises", (req, res) => {
     for(let i in exerciseData){
       allExercises.push({username: exerciseData[i].username, description: exerciseData[i].description, duration: exerciseData[i].duration, date: exerciseData[i].date, _id: exerciseData[i].id })
     }
-    //console.log(allExercises);
     res.send(allExercises);
   });
 });
@@ -180,8 +170,6 @@ app.get("/api/users/:_id/logs", (req, res) => {
   let count = 0;
   let arr = [];
   let finalLog;
-  
-  console.log("answers", fromQuery, toQuery, limitQuery);
   let searchFilter = {};
   let tempTo = new Date(toQuery);
   let tempFrom = new Date(fromQuery);
@@ -190,21 +178,17 @@ app.get("/api/users/:_id/logs", (req, res) => {
     searchFilter = {id: logId};
   } else if(fromQuery.match(/(\d{4})-(\d{2})-(\d{2})/) && toQuery.match(/(\d{4})-(\d{2})-(\d{2})/)){
     searchFilter = {id: logId, date: {$gt: tempFrom, $lt: tempTo}};
-    console.log('working');
   } else {
     return res.send("There is an issue with your query format");
-    console.log('all failed');
   }
 
   Exercise.find(searchFilter).then((thisthing) => {
-    console.log('thisthing', thisthing);
     for(let l in thisthing){
     arr.push({description: thisthing[l].description, duration: thisthing[l].duration, date: thisthing[l].date.toDateString()});
     count = count += 1;
     }
 
     if(!isNaN(limitQuery) && limitQuery !== undefined){
-      console.log("There is a limit");
       arr.length = limitQuery;
       count = limitQuery;
     }
@@ -215,7 +199,6 @@ app.get("/api/users/:_id/logs", (req, res) => {
       _id: logId,
       logs: arr
     };
-    console.log('finalLog', finalLog);
     res.send(finalLog);
   })
   
