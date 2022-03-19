@@ -6,26 +6,35 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 const { v4: uuidv4 } = require('uuid');
-
-
+const res = require('express/lib/response');
 
 app.use(cors());
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: "false" }));
 app.use(bodyParser.json());
 
-//serve HTML/Css files
+
+/***********************************************/
+ /********** Serve HTML/CSS **********/
+/*********************************************/
+
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html')
 });
 
-//connect to mongodb
+  /***********************************************/
+ /********** Connect To MongoDB Atlas **********/
+/*********************************************/
+
 uri = process.env.MONGO_URI;
 
 mongoose.connect(uri, {useNewUrlParser: true})
 .catch((err) => console.log(err));
 
-//schema setup
+  /***********************************/
+ /********** Schema Setup **********/
+/*********************************/
+
 const exerciseSchema = new Schema({
   username: {type:String, required: true},
   description: String,
@@ -43,7 +52,19 @@ const userSchema = new Schema({
 
 const User = mongoose.model("User", userSchema);
 
-//Check for user, create new users
+  /***********************************************/
+ /********** Helper Functions ******************/
+/*********************************************/
+
+
+
+
+
+
+  /*******************************************************/
+ /********** Post - "/api/users" Create Users **********/
+/*****************************************************/
+
 app.post("/api/users", (req,res, next)=> {
   let checkName = req.body.username;
   let newId = uuidv4();
@@ -72,7 +93,10 @@ app.post("/api/users", (req,res, next)=> {
   
 });
 
-//Get an array of all users
+  /********************************************************/
+ /********** Get - "/api/users" - Get user list **********/
+/********************************************************/
+
 app.get("/api/users", (req, res) => {
   User.find({}).select("-__v").exec((err, allUsersData) => {
     if(err) res.send("There was an error getting user data, try agin.");
@@ -86,7 +110,10 @@ app.get("/api/users", (req, res) => {
   });
 });
 
-//Add an exercise for a user
+  /*******************************************************************************/
+ /********** Post - "/api/users/:_id/exercises - Create new Exercises" **********/
+/*******************************************************************************/
+
 app.post("/api/users/:_id/exercises", (req, res) => {
   let userId = req.body[':_id'];
   let enteredDate = req.body.date;
@@ -123,7 +150,11 @@ app.post("/api/users/:_id/exercises", (req, res) => {
   
 })
 ;
-//Get all exercises for a user
+
+  /***************************************************************************/
+ /********** Get - "/api/users/:_id/exercises" - Get all exercises **********/
+/***************************************************************************/
+
 app.get("/api/users/:_id/exercises", (req, res) => {
   let requestId = req.params._id;
   Exercise.find({id: requestId}).select("-__v").exec((err, exerciseData)=> {
@@ -137,27 +168,66 @@ app.get("/api/users/:_id/exercises", (req, res) => {
   });
 });
 
+  /***************************************************************************/
+ /********** Get - "/api/users/:_id/log" - Get user log *********************/
+/***************************************************************************/
+
 app.get("/api/users/:_id/logs", (req, res) => {
   let logId = req.params._id;
-
   let toQuery = req.query.to;
   let fromQuery = req.query.from;
   let limitQuery = req.query.limit;
+  let count = 0;
+  let arr = [];
+  let finalLog;
   
-  Exercise.find({id: logId}).select("-__v").exec((err, exerciseLog) => {
-    if(err) res.send("There was an issue collecting user data, please try again.");
-    //console.log(exerciseLog);
-    let logArr = [];
-    let count = 0;
-    for(let j in exerciseLog){
-      logArr.push({description: exerciseLog[j]. description, duration: exerciseLog[j].duration, date: exerciseLog[j].date.toDateString()});
-      count = count += 1;
+  console.log("answers", fromQuery, toQuery, limitQuery);
+  let searchFilter = {};
+  let tempTo = new Date(toQuery);
+  let tempFrom = new Date(fromQuery);
+
+  if(fromQuery === undefined){
+    searchFilter = {id: logId};
+  } else if(fromQuery.match(/(\d{4})-(\d{2})-(\d{2})/) && toQuery.match(/(\d{4})-(\d{2})-(\d{2})/)){
+    searchFilter = {id: logId, date: {$gt: tempFrom, $lt: tempTo}};
+    console.log('working');
+  } else {
+    return res.send("There is an issue with your query format");
+    console.log('all failed');
+  }
+
+  Exercise.find(searchFilter).then((thisthing) => {
+    console.log('thisthing', thisthing);
+    for(let l in thisthing){
+    arr.push({description: thisthing[l].description, duration: thisthing[l].duration, date: thisthing[l].date.toDateString()});
+    count = count += 1;
     }
-    let newLog = {username: exerciseLog[0].username, count: count, _id: logId, logs: logArr}
-    res.send(newLog);
+
+    if(!isNaN(limitQuery) && limitQuery !== undefined){
+      console.log("There is a limit");
+      arr.length = limitQuery;
+      count = limitQuery;
+    }
+    
+    finalLog = {
+      username: thisthing[0].username,
+      count: count,
+      _id: logId,
+      logs: arr
+    };
+    console.log('finalLog', finalLog);
+    res.send(finalLog);
   })
+  
+  
 });
+
+
 
 const listener = app.listen(process.env.PORT || 3000, () => {
   console.log('Your app is listening on port ' + listener.address().port)
 });
+
+
+
+
