@@ -166,7 +166,7 @@ app.get("/api/users/:_id/logs", (req, res) => {
   let logId = req.params._id;
   let toQuery = req.query.to;
   let fromQuery = req.query.from;
-  let limitQuery = req.query.limit;
+  let limitQuery = Number(req.query.limit) || 0;
   let count = 0;
   let arr = [];
   let finalLog;
@@ -188,7 +188,7 @@ app.get("/api/users/:_id/logs", (req, res) => {
     count = count += 1;
     }
 
-    if(!isNaN(limitQuery) && limitQuery !== undefined){
+    if(typeof limitQuery === 'number' && limitQuery < count){
       arr.length = limitQuery;
       count = limitQuery;
     }
