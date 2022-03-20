@@ -113,14 +113,15 @@ app.post("/api/users/:_id/exercises", (req, res) => {
   let enteredDate = req.body.date;
   let current
 
-  if(enteredDate.match(/(\d{4})-(\d{2})-(\d{2})/)){
+  enteredDate = new Date(enteredDate || null);
+  /*if(enteredDate.match(/(\d{4})-(\d{2})-(\d{2})/)){
     current = new Date(enteredDate);
     enteredDate = current;
   } else {
     
     current = new Date(Date.now());
     enteredDate = current;
-  }
+  }*/
 
   //For some reason using findById wouldn't work and returned a null no matter what
   //Had to use findOne and add the obj to get it to return user
