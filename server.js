@@ -118,7 +118,7 @@ app.post("/api/users/:_id/exercises", (req, res) => {
     enteredDate = current;
   } else {
     
-    current = new Date();
+    current = new Date(Date.now());
     enteredDate = current;
   }
 
