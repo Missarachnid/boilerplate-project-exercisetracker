@@ -132,7 +132,7 @@ app.post("/api/users/:_id/exercises", (req, res) => {
         id: userId});
         console.log('workout data', workout);
     workout.save().then(saveData => {
-      let exerciseInfo = {username: saveData.username, description: saveData.description, duration: saveData.duration, _id: saveData.id, date: saveData.date.toDateString()};
+      let exerciseInfo = {username: saveData.username, description: saveData.description, duration: saveData.duration, date: saveData.date.toDateString(), _id: saveData.id};
       console.log("exercise saved", exerciseInfo);
       res.send(exerciseInfo);
     });
