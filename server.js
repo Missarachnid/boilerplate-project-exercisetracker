@@ -130,8 +130,10 @@ app.post("/api/users/:_id/exercises", (req, res) => {
         description: req.body.description, 
         duration: req.body.duration, date: enteredDate, 
         id: userId});
+        console.log('workout data', workout);
     workout.save().then(saveData => {
-      let exerciseInfo = {username: saveData.username, description: saveData.description, duration: saveData.duration, date: saveData.date.toDateString(), _id: saveData.id}
+      let exerciseInfo = {username: saveData.username, description: saveData.description, duration: saveData.duration, _id: saveData.id, date: saveData.date.toDateString()};
+      console.log("exercise saved", exerciseInfo);
       res.send(exerciseInfo);
     });
   }).catch(err => {
@@ -190,7 +192,7 @@ app.get("/api/users/:_id/logs", (req, res) => {
 
     if(typeof limitQuery === 'number' && limitQuery < count){
       arr.length = limitQuery;
-      count = limitQuery;
+      //count = limitQuery;
     }
     
     finalLog = {
