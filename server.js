@@ -113,15 +113,14 @@ app.post("/api/users/:_id/exercises", (req, res) => {
   let enteredDate = req.body.date;
   let current
 
-  enteredDate = new Date(enteredDate || null);
-  /*if(enteredDate.match(/(\d{4})-(\d{2})-(\d{2})/)){
+  if(enteredDate.match(/(\d{4})-(\d{2})-(\d{2})/)){
     current = new Date(enteredDate);
     enteredDate = current;
   } else {
     
     current = new Date();
     enteredDate = current;
-  }*/
+  }
 
   //For some reason using findById wouldn't work and returned a null no matter what
   //Had to use findOne and add the obj to get it to return user
@@ -169,7 +168,8 @@ app.get("/api/users/:_id/logs", (req, res) => {
   let logId = req.params._id;
   let toQuery = req.query.to;
   let fromQuery = req.query.from;
-  let limitQuery = Number(req.query.limit) || 0;
+  //let limitQuery = Number(req.query.limit) || 0;
+  let limitQuery = Number(req.query.limit);
   let count = 0;
   let arr = [];
   let finalLog;
@@ -186,11 +186,15 @@ app.get("/api/users/:_id/logs", (req, res) => {
   }
 
   Exercise.find(searchFilter).then((thisthing) => {
+    console.log('thisthing', thisthing);
     for(let l in thisthing){
     arr.push({description: thisthing[l].description, duration: thisthing[l].duration, date: thisthing[l].date.toDateString()});
+    //console.log("arr", arr);
     count = count += 1;
     }
+    console.log('limitQuery', limitQuery);
 
+    //should I add an error return for non numbers for limit query?
     if(typeof limitQuery === 'number' && limitQuery < count){
       arr.length = limitQuery;
       //count = limitQuery;
