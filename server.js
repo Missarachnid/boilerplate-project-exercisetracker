@@ -111,15 +111,13 @@ app.get("/api/users", (req, res) => {
 app.post("/api/users/:_id/exercises", (req, res) => {
   let userId = req.body[':_id'];
   let enteredDate = req.body.date;
-  let current
+  let current;
 
   if(enteredDate.match(/(\d{4})-(\d{2})-(\d{2})/)){
     current = new Date(enteredDate);
-    enteredDate = current;
   } else {
     
-    current = new Date();
-    enteredDate = current;
+    current = new Date(Date.now());
   }
 
   //For some reason using findById wouldn't work and returned a null no matter what
@@ -128,7 +126,7 @@ app.post("/api/users/:_id/exercises", (req, res) => {
     let workout = new Exercise(
       {username: data.username, 
         description: req.body.description, 
-        duration: req.body.duration, date: enteredDate, 
+        duration: req.body.duration, date: current, 
         id: userId});
         console.log('workout data', workout);
     workout.save().then(saveData => {
@@ -154,7 +152,7 @@ app.get("/api/users/:_id/exercises", (req, res) => {
     if(err) res.send("There was an issue finding users exercises, please try again");
     let allExercises = [];
     for(let i in exerciseData){
-      allExercises.push({username: exerciseData[i].username, description: exerciseData[i].description, duration: exerciseData[i].duration, date: exerciseData[i].date, _id: exerciseData[i].id })
+      allExercises.push({username: exerciseData[i].username, description: exerciseData[i].description, duration: exerciseData[i].duration, date: exerciseData[i].date.toDateString(), _id: exerciseData[i].id })
     }
     res.send(allExercises);
   });
