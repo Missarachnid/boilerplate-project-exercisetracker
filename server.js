@@ -95,9 +95,9 @@ app.get("/api/users", (req, res) => {
   })
 });
 
-  /********************************************************************/
- /********** Post - "/api/users/:id/exercises" Create Users **********/
-/********************************************************************/
+  /****************************************************************************/
+ /********** Post - "/api/users/:id/exercises" Create user exercises**********/
+/****************************************************************************/
 
 app.post("/api/users/:_id/exercises", (req, res) => {
   let userIdInput = req.body[':_id'];
@@ -148,8 +148,26 @@ if(userIdInput === "" || userIdInput === undefined){
   console.log(typeof durationInput);
   console.log('date', dateFormat)
   console.log("test", userIdInput, durationInput, descriptionInput, dateFormat.toDateString());
-  
 });
+
+  /**************************************************************************/
+ /********** Get - "/api/users/:id/exercises" Get users exercises **********/
+/**************************************************************************/
+
+app.get("/api/users/:_id/exercises", (req, res) => {
+  let requestId = req.params['_id'];
+  console.log('id', requestId);
+  Exercise.find({id: requestId}).exec((err, exerciseData)=> {
+    //console.log('check', exerciseData);
+    if(err) res.send("There was an issue finding users exercises, please try again");
+    let allExercises = [];
+    for(let i in exerciseData){
+      allExercises.push({username: exerciseData[i].username, description: exerciseData[i].description, duration: exerciseData[i].duration, date: exerciseData[i].date.toDateString(), _id: exerciseData[i].id })
+    }
+    res.send(allExercises);
+  });
+});
+
 const listener = app.listen(process.env.PORT || 3000, () => {
   console.log('Your app is listening on port ' + listener.address().port)
 });
