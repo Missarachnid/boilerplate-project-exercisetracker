@@ -127,7 +127,7 @@ app.post("/api/users/:_id/exercises", (req, res) => {
   }
   User.findOne({id: userIdInput}, (err, exerciseData) => {
     if(err) return res.send("There was an issue saving this exercise. Please try again.");
-    console.log("exerciseData");
+    console.log("exerciseData", exerciseData);
     if(!exerciseData){
       return res.send("Incorrect user id. Please try agaain.");
     }
