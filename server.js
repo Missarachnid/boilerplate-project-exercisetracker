@@ -8,7 +8,6 @@ const { Schema } = mongoose;
 const { v4: uuidv4 } = require('uuid');
 const res = require('express/lib/response');
 
-
 app.use(cors());
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: "false" }));
@@ -51,7 +50,6 @@ const userSchema = new Schema({
 });
 
 const User = mongoose.model("User", userSchema);
-
 
   /********************************************************/
  /********** Post - "/api/users" Create Users ***********/
@@ -104,7 +102,6 @@ app.post("/api/users/:_id/exercises", (req, res) => {
   let durationInput = req.body.duration;
   let descriptionInput = req.body.description;
   let dateInput = req.body.date;
-  console.log("allInputs", {userId: userIdInput, date: dateInput, description: descriptionInput, duration: durationInput});
   let dateFormat;
 
 //create if date fits date format create date obj, otherwise time is now
@@ -116,16 +113,6 @@ if(userIdInput === "" || userIdInput === undefined){
   if(descriptionInput === "" || descriptionInput === undefined){
     return res.send("You must enter exercise details. Please try again.");
   }
-
-  
-
-  /*if(dateInput.match(/(\d{4})-(\d{2})-(\d{2})/)){
-    dateFormat = new Date(dateInput);
-  }else {
-    dateFormat = new Date(Date.now());
-  }
-  console.log("dateFormat", dateFormat);
-*/
   
   User.findOne({id: userIdInput}, (err, exerciseData) => {
     if(err) return res.send("There was an issue saving this exercise. Please try again.");
@@ -183,7 +170,6 @@ app.get("/api/users/:_id/logs", (req, res) => {
   let tempTo = new Date(toQuery);
   let tempFrom = new Date(fromQuery);
 
-
   if(fromQuery === undefined){
     searchFilter = {id: logId};
   } else if(fromQuery.match(/(\d{4})-(\d{2})-(\d{2})/) && toQuery.match(/(\d{4})-(\d{2})-(\d{2})/)){
@@ -215,7 +201,6 @@ app.get("/api/users/:_id/logs", (req, res) => {
     };
     res.send(finalLog);
   })
-  
   
 });
 
