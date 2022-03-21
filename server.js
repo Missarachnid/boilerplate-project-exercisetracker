@@ -166,7 +166,7 @@ app.get("/api/users/:_id/exercises", (req, res) => {
 /****************************************************************************/
 
 app.get("/api/users/:_id/logs", (req, res) => {
-  let logId = req.params['_id'];
+  let logId = req.params._id;
   let toQuery = req.query.to;
   let fromQuery = req.query.from;
   let limitQuery = Number(req.query.limit);
@@ -184,15 +184,18 @@ app.get("/api/users/:_id/logs", (req, res) => {
   } else {
     return res.send("There is an issue with your query format");
   }
-
-  Exercise.find(searchFilter).exec((err, thisthing) => {
+  
+  Exercise.find({...searchFilter}).exec((err, thisthing) => {
     if(err) return res.send("There was an error finding exercises for this user");
 
+    if(thisthing.length === 0){
+      return res.send("This user has no exercises");
+    }
+    
     for(let l in thisthing){
     arr.push({description: thisthing[l].description, duration: thisthing[l].duration, date: thisthing[l].date.toDateString()});
     count = count += 1;
     }
-    console.log('limitQuery', limitQuery);
 
     if(typeof limitQuery === 'number' && limitQuery < count){
       arr.length = limitQuery;
