@@ -1,4 +1,4 @@
-# Free Code Camp Exercise Tracker Project - WIP
+# Free Code Camp Exercise Tracker Project
 
 ## Requirements:
 *  You should provide your own project, not the example URL.
@@ -23,8 +23,6 @@
 *  MongoDB
 *  Mongoose
 
-## Once finished, project can be seen [here]().
+## project can be seen [here](https://fcc-exercise-app.herokuapp.com/).
 
 # [Exercise Tracker Example](https://www.freecodecamp.org/learn/apis-and-microservices/apis-and-microservices-projects/exercise-tracker)
-
-
