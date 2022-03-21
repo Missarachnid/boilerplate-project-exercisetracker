@@ -6,6 +6,7 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 const { v4: uuidv4 } = require('uuid');
+const res = require('express/lib/response');
 
 
 app.use(cors());
@@ -105,14 +106,20 @@ app.post("/api/users/:_id/exercises", (req, res) => {
   let dateInput = req.body.date;
   let dateFormat;
   console.log("Description input", descriptionInput);
-  console.log("userId", userIdInput);
+  console.log("userId ", userIdInput);
+  console.log('date input', dateInput);
 
 //create if date fits date format create date obj, otherwise time is now
+if(userIdInput === "" || userIdInput === undefined){
+  return res.send("You must enter a user id number. Please try again.");
+}
+
   if(dateInput.match(/(\d{4})-(\d{2})-(\d{2})/)){
     dateFormat = new Date(dateInput);
   }else {
     dateFormat = new Date(Date.now());
   }
+  console.log("dateFormat", dateFormat);
 
   //prevent empty inputs
   if(descriptionInput === "" || descriptionInput === undefined){
@@ -122,9 +129,7 @@ app.post("/api/users/:_id/exercises", (req, res) => {
   if(durationInput === "" || durationInput === undefined){
     return res.send("You must enter a duration time. Please try again.");
   }
-  if(userIdInput === "" || userIdInput === undefined){
-    return res.send("You must enter a user id number. Please try again.");
-  }
+  
   User.findOne({id: userIdInput}, (err, exerciseData) => {
     if(err) return res.send("There was an issue saving this exercise. Please try again.");
     console.log("exerciseData", exerciseData);
@@ -144,7 +149,7 @@ app.post("/api/users/:_id/exercises", (req, res) => {
   console.log('date', dateFormat)
   console.log("test", userIdInput, durationInput, descriptionInput, dateFormat.toDateString());
   
-})
+});
 const listener = app.listen(process.env.PORT || 3000, () => {
   console.log('Your app is listening on port ' + listener.address().port)
 });
