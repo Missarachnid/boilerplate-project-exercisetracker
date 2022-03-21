@@ -211,7 +211,7 @@ app.get("/api/users/:_id/logs", (req, res) => {
       username: thisthing[0].username,
       count: count,
       _id: logId,
-      logs: arr
+      log: arr
     };
     res.send(finalLog);
   })
