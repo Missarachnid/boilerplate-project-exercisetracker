@@ -61,7 +61,7 @@ app.post("/api/users", (req, res) => {
   let newId = uuidv4();
 
   if(usernameInput === "" || usernameInput === undefined){
-    res.send("Username is required");
+    return res.send("Username is required");
   }
 
   User.findOne({username: usernameInput}, (err, data) => {
@@ -70,7 +70,7 @@ app.post("/api/users", (req, res) => {
       let newUser = new User({username: usernameInput, id: newId});
       newUser.save((err, newUserData) => {
         if(err) return res.send("There was an issue registering new user. Please try again");
-        res.json({username: newUserData.username, _id: newUserData.id})
+        return res.json({username: newUserData.username, _id: newUserData.id})
       })
     } else {
       return res.json({username: data.username, _id: data.id})
