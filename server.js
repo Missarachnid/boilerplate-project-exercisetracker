@@ -100,7 +100,8 @@ app.get("/api/users", (req, res) => {
 /****************************************************************************/
 
 app.post("/api/users/:_id/exercises", (req, res) => {
-  let userIdInput = req.body[':_id'];
+  //let userIdInput = req.body[':_id'];
+  let userIdInput = req.params._id;
   let durationInput = req.body.duration;
   let descriptionInput = req.body.description;
   let dateInput = req.body.date;
