@@ -103,9 +103,9 @@ app.post("/api/users/:_id/exercises", (req, res) => {
   let durationInput = req.body.duration;
   let descriptionInput = req.body.description;
   let dateInput = req.body.date;
-  let userNameExercise;
   let dateFormat;
-
+  console.log("Description input", descriptionInput);
+  console.log("userId", userIdInput);
 
 //create if date fits date format create date obj, otherwise time is now
   if(dateInput.match(/(\d{4})-(\d{2})-(\d{2})/)){
@@ -115,24 +115,24 @@ app.post("/api/users/:_id/exercises", (req, res) => {
   }
 
   //prevent empty inputs
-  if(descriptionInput === ""){
-    res.send("You must enter exercise details. Please try again.");
+  if(descriptionInput === "" || descriptionInput === undefined){
+    return res.send("You must enter exercise details. Please try again.");
   }
 
-  if(durationInput === ""){
-    res.send("You must enter a duration time. Please try again.");
+  if(durationInput === "" || durationInput === undefined){
+    return res.send("You must enter a duration time. Please try again.");
   }
-  if(userIdInput === ""){
-    res.send("You must enter a user id number. Please try again.");
+  if(userIdInput === "" || userIdInput === undefined){
+    return res.send("You must enter a user id number. Please try again.");
   }
   User.findOne({id: userIdInput}, (err, exerciseData) => {
     if(err) return res.send("There was an issue saving this exercise. Please try again.");
     if(!exerciseData){
-      res.send("Incorrect user id. Please try agaain.");
+      return res.send("Incorrect user id. Please try agaain.");
     }
     let workout = new Exercise({username: exerciseData.username, description: descriptionInput, duration: durationInput, date: dateFormat, id: userIdInput});
     workout.save().then((exerciseSaveData) => {
-      res.json({username: exerciseSaveData.username, description: exerciseSaveData.description, duration: exerciseSaveData.duration, date: exerciseSaveData.date.toDateString(), _id: exerciseSaveData.id});
+      return res.json({username: exerciseSaveData.username, description: exerciseSaveData.description, duration: exerciseSaveData.duration, date: exerciseSaveData.date.toDateString(), _id: exerciseSaveData.id});
     }).catch((err) => {
       console.log("Exercise save error", err);
       return res.send("Error saving new exercise. please try again.");
