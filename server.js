@@ -100,15 +100,11 @@ app.get("/api/users", (req, res) => {
 /****************************************************************************/
 
 app.post("/api/users/:_id/exercises", (req, res) => {
-  //let userIdInput = req.body[':_id'];
   let userIdInput = req.params._id;
   let durationInput = req.body.duration;
   let descriptionInput = req.body.description;
   let dateInput = req.body.date;
   let dateFormat;
-  console.log("Description input", descriptionInput);
-  console.log("userId ", userIdInput);
-  console.log('date input', dateInput);
 
 //create if date fits date format create date obj, otherwise time is now
 if(userIdInput === "" || userIdInput === undefined){
@@ -133,7 +129,6 @@ if(userIdInput === "" || userIdInput === undefined){
   
   User.findOne({id: userIdInput}, (err, exerciseData) => {
     if(err) return res.send("There was an issue saving this exercise. Please try again.");
-    console.log("exerciseData", exerciseData);
     if(!exerciseData){
       return res.send("Incorrect user id. Please try agaain.");
     }
@@ -146,8 +141,6 @@ if(userIdInput === "" || userIdInput === undefined){
     });
   });
 
-  console.log(typeof durationInput);
-  console.log('date', dateFormat)
   console.log("test", userIdInput, durationInput, descriptionInput, dateFormat.toDateString());
 });
 
@@ -157,9 +150,8 @@ if(userIdInput === "" || userIdInput === undefined){
 
 app.get("/api/users/:_id/exercises", (req, res) => {
   let requestId = req.params['_id'];
-  console.log('id', requestId);
+  
   Exercise.find({id: requestId}).exec((err, exerciseData)=> {
-    //console.log('check', exerciseData);
     if(err) res.send("There was an issue finding users exercises, please try again");
     let allExercises = [];
     for(let i in exerciseData){
@@ -167,6 +159,54 @@ app.get("/api/users/:_id/exercises", (req, res) => {
     }
     res.send(allExercises);
   });
+});
+
+  /****************************************************************************/
+ /********** Get - "/api/users/:id/logs" Create user log *********************/
+/****************************************************************************/
+
+app.get("/api/users/:_id/logs", (req, res) => {
+  let logId = req.params['_id'];
+  let toQuery = req.query.to;
+  let fromQuery = req.query.from;
+  let limitQuery = Number(req.query.limit);
+  let count = 0;
+  let arr = [];
+  let finalLog;
+  let searchFilter = {};
+  let tempTo = new Date(toQuery);
+  let tempFrom = new Date(fromQuery);
+
+  if(fromQuery === undefined){
+    searchFilter = {id: logId};
+  } else if(fromQuery.match(/(\d{4})-(\d{2})-(\d{2})/) && toQuery.match(/(\d{4})-(\d{2})-(\d{2})/)){
+    searchFilter = {id: logId, date: {$gt: tempFrom, $lt: tempTo}};
+  } else {
+    return res.send("There is an issue with your query format");
+  }
+
+  Exercise.find(searchFilter).exec((err, thisthing) => {
+    if(err) return res.send("There was an error finding exercises for this user");
+
+    for(let l in thisthing){
+    arr.push({description: thisthing[l].description, duration: thisthing[l].duration, date: thisthing[l].date.toDateString()});
+    count = count += 1;
+    }
+    console.log('limitQuery', limitQuery);
+
+    if(typeof limitQuery === 'number' && limitQuery < count){
+      arr.length = limitQuery;
+    }
+    finalLog = {
+      username: thisthing[0].username,
+      count: count,
+      _id: logId,
+      logs: arr
+    };
+    res.send(finalLog);
+  })
+  
+  
 });
 
 const listener = app.listen(process.env.PORT || 3000, () => {
