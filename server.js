@@ -104,6 +104,7 @@ app.post("/api/users/:_id/exercises", (req, res) => {
   let durationInput = req.body.duration;
   let descriptionInput = req.body.description;
   let dateInput = req.body.date;
+  console.log("dateInput");
   let dateFormat;
 
 //create if date fits date format create date obj, otherwise time is now
@@ -176,6 +177,7 @@ app.get("/api/users/:_id/logs", (req, res) => {
   let searchFilter = {};
   let tempTo = new Date(toQuery);
   let tempFrom = new Date(fromQuery);
+
 
   if(fromQuery === undefined){
     searchFilter = {id: logId};
