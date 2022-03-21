@@ -119,13 +119,13 @@ if(userIdInput === "" || userIdInput === undefined){
 
   
 
-  if(dateInput.match(/(\d{4})-(\d{2})-(\d{2})/)){
+  /*if(dateInput.match(/(\d{4})-(\d{2})-(\d{2})/)){
     dateFormat = new Date(dateInput);
   }else {
     dateFormat = new Date(Date.now());
   }
   console.log("dateFormat", dateFormat);
-
+*/
   
   User.findOne({id: userIdInput}, (err, exerciseData) => {
     if(err) return res.send("There was an issue saving this exercise. Please try again.");
@@ -133,6 +133,11 @@ if(userIdInput === "" || userIdInput === undefined){
       return res.send("Incorrect user id. Please try agaain.");
     }
     let workout = new Exercise({username: exerciseData.username, description: descriptionInput, duration: durationInput, date: dateFormat, id: userIdInput});
+    if(dateInput && dateInput !== "") {
+      workout.date = new Date(dateInput);
+    } else {
+      workout.date = new Date();
+    }
     workout.save().then((exerciseSaveData) => {
       return res.json({username: exerciseSaveData.username, description: exerciseSaveData.description, duration: exerciseSaveData.duration, date: exerciseSaveData.date.toDateString(), _id: exerciseSaveData.id});
     }).catch((err) => {
@@ -140,8 +145,6 @@ if(userIdInput === "" || userIdInput === undefined){
       return res.send("Error saving new exercise. please try again.");
     });
   });
-
-  console.log("test", userIdInput, durationInput, descriptionInput, dateFormat.toDateString());
 });
 
   /**************************************************************************/
