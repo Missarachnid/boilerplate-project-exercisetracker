@@ -104,13 +104,20 @@ app.post("/api/users/:_id/exercises", (req, res) => {
   let durationInput = req.body.duration;
   let descriptionInput = req.body.description;
   let dateInput = req.body.date;
-  console.log("dateInput");
+  console.log("allInputs", {userId: userIdInput, date: dateInput, description: descriptionInput, duration: durationInput});
   let dateFormat;
 
 //create if date fits date format create date obj, otherwise time is now
 if(userIdInput === "" || userIdInput === undefined){
   return res.send("You must enter a user id number. Please try again.");
 }
+
+  //prevent empty inputs
+  if(descriptionInput === "" || descriptionInput === undefined){
+    return res.send("You must enter exercise details. Please try again.");
+  }
+
+  
 
   if(dateInput.match(/(\d{4})-(\d{2})-(\d{2})/)){
     dateFormat = new Date(dateInput);
@@ -119,14 +126,6 @@ if(userIdInput === "" || userIdInput === undefined){
   }
   console.log("dateFormat", dateFormat);
 
-  //prevent empty inputs
-  if(descriptionInput === "" || descriptionInput === undefined){
-    return res.send("You must enter exercise details. Please try again.");
-  }
-
-  if(durationInput === "" || durationInput === undefined){
-    return res.send("You must enter a duration time. Please try again.");
-  }
   
   User.findOne({id: userIdInput}, (err, exerciseData) => {
     if(err) return res.send("There was an issue saving this exercise. Please try again.");
