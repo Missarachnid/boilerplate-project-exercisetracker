@@ -154,6 +154,9 @@ app.get("/api/users/:_id/exercises", (req, res) => {
   
   Exercise.find({id: requestId}).exec((err, exerciseData)=> {
     if(err) res.send("There was an issue finding users exercises, please try again");
+    if(exerciseData.length === 0){
+      return res.send("This user has no exercises");
+    }
     let allExercises = [];
     for(let i in exerciseData){
       allExercises.push({username: exerciseData[i].username, description: exerciseData[i].description, duration: exerciseData[i].duration, date: exerciseData[i].date.toDateString(), _id: exerciseData[i].id })
